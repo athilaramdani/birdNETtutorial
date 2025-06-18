@@ -215,12 +215,14 @@ jika ingin memakai beberapa opsi ada di bagian 2
 ### B. **Fine‑Tuned / Extended (dataset kita + spesies lama)**
 
 Menambah label baru di atas model asli.
-
+> jika belum punya folder *analyze3* dan *train3* di folder *output*, buat terlebih dahulu
 ```powershell
 py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train3" --model_format raven --model_save_mode append
 ```
 
-setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :\
+setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :
+
+
 
 ```powershell
 py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\projek dosen\09mei2025\output\analyze3" --classifier "F:\projek_dosen\09mei2025\output\train3" --slist "F:\projek_dosen\09mei2025\output\train3\labels\label_names.csv"
@@ -230,14 +232,16 @@ py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\
 
 Membuang layer klasifikasi lama → hanya prediksi spesies dalam dataset kamu.
 
+> jika belum punya folder *analyze4* dan *train4* di folder *output*, buat terlebih dahulu
+
 ```powershell
-py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train3" --model_format raven --model_save_mode replace
+py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train4" --model_format raven --model_save_mode replace
 ```
 
-setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :\
+setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :
 
 ```powershell
-py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\projek dosen\09mei2025\output\analyze3" --classifier "F:\projek_dosen\09mei2025\output\train3" --slist "F:\projek_dosen\09mei2025\output\train3\labels\label_names.csv"
+py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\projek dosen\09mei2025\output\analyze4" --classifier "F:\projek_dosen\09mei2025\output\train4" --slist "F:\projek_dosen\09mei2025\output\train4\labels\label_names.csv"
 ```
 
 > 🔖 **Tip:** Jika label baru ≪ lama, pakai `--focal-loss` atau atur `--upsampling_ratio` agar kelas baru tidak tenggelam.
