@@ -2,6 +2,19 @@
 
 > **Tujuan**: Membantu dosen/penilai menjalankan *inference* **dan** *training* cepat menggunakan BirdNET‑Analyzer di Windows (CMD/PowerShell).
 
+referensi dari artikel :
+```
+@article{kahl2021birdnet,
+  title={BirdNET: A deep learning solution for avian diversity monitoring},
+  author={Kahl, Stefan and Wood, Connor M and Eibl, Maximilian and Klinck, Holger},
+  journal={Ecological Informatics},
+  volume={61},
+  pages={101236},
+  year={2021},
+  publisher={Elsevier}
+}
+```
+
 ---
 
 ## 1. Struktur Folder dan Dataset
@@ -114,6 +127,22 @@ test_grouped\
 ```powershell
 py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train1"
 ```
+### Opsi Penting `train`
+
+| Flag                                  | Fungsi                                                                               | Default                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
+| `-o, --output`                        | Tempat menyimpan model hasil                                                         | `checkpoints/custom/Custom_Classifier` |
+| `--epochs`                            | Total putaran pelatihan                                                              | **50**                                 |
+| `--batch_size`                        | Banyaknya sampel per iterasi                                                         | **32**                                 |
+| `--val_split`                         | Persentase data validasi (0–1)                                                       | **0.2**                                |
+| `--learning_rate`                     | LR awal optimizer                                                                    | **0.0001**                             |
+| `--threads, -t`                       | Jumlah thread CPU                                                                    | **2**                                  |
+| `--test_data`                         | **Folder validasi terpisah** → meniadakan `val_split`                                | `None`                                 |
+| `--focal-loss`                        | Aktifkan *Focal Loss* (imbalance)                                                    | `False`                                |
+| `--model_save_mode`                   | `replace` = hanya spesies baru, `append` = gabung spesies lama + baru                | `replace`                               |
+| `--model_format`                      | `tflite`, `raven`, atau `both`                                                       | `tflite`                               |
+
+> ⭐ **Highlight:** `--model_save_mode` menentukan apakah kamu *retrained* (replace) atau *fine‑tuned/extended* (append).\
 
 contoh output akan seperti ini
 ```powershell
@@ -149,23 +178,55 @@ No separate test data provided for evaluation. Using validation metrics.
 ...Done. Best AUPRC: 0.8253326416015625, Best AUROC: 0.9644060134887695, Best Loss: 1.0184696912765503 (epoch 50/50)
 ```
 
-nanti di folder `train 1`
-
-### Opsi Penting `train`
-
-| Opsi              | Fungsi             | Default                                |
-| ----------------- | ------------------ | -------------------------------------- |
-| `-o / --output`   | Lokasi model hasil | `checkpoints/custom/Custom_Classifier` |
-| `--epochs`        | Jumlah epoch       | **50**                                 |
-| `--batch_size`    | Ukuran batch       | **32**                                 |
-| `--val_split`     | Rasio validasi     | **0.2**                                |
-| `--learning_rate` | Learning rate awal | **0.0001**                             |
-| `--threads`       | Jumlah CPU thread  | **2**                                  |
-| `--focal-loss`    | Gunakan focal loss | `False`                                |
+nanti di folder `train1` akan berisikan
+```
+train1\
+├── train1_Labels.txt
+├── train1_Params.csv
+├── train1_sample_counts.csv
+└── train1.tflite
+```
 
 ---
 
-##
+## 2  Sering Dipakai (Nice to Have)
+
+* `--hidden_units <int>`   ➡️ >0 membuat classifier 2‑layer.
+* `--dropout <0‑0.9>`      ➡️ Regularisasi biar nggak over‑fit.
+* `--crop_mode` \[`center`|`first`|`segments`|`smart`]   ➡️ Cara memotong audio >3 s.
+* `--overlap <sec>`        ➡️ Overlap antar segmen (butuh `crop_mode segments`).
+* `--upsampling_ratio`     ➡️ Seimbangkan kelas minoritas.
+* `--upsampling_mode` \[`repeat`|`linear`|`mean`|`smote`]
+* `--autotune` + `--autotune_trials N`   ➡️ Cari HP terbaik otomatis.
+
+---
+
+## Pembagian *Original*, *fine_tuned*, dan *retrained*
+### A. **Original (hanya dataset dari birdNETnya saja)**
+Hanya Analisis langsung menggunakan model original dari birdNET
+```powershell
+py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped" -o "F:\projek_dosen\09mei2025\output\analyze1"
+```
+jika ingin memakai beberapa opsi ada di bagian 2
+
+### A. **Fine‑Tuned / Extended (dataset kita + spesies lama)**
+
+Menambah label baru di atas model asli.
+
+```powershell
+py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train2" --model_save_mode append
+```
+
+### B. **Retrained (dataset sendiri saja)**
+
+Membuang layer klasifikasi lama → hanya prediksi spesies dalam dataset kamu.
+
+```powershell
+py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train2" --model_save_mode replace
+```
+> 🔖 **Tip:** Jika label baru ≪ lama, pakai `--focal-loss` atau atur `--upsampling_ratio` agar kelas baru tidak tenggelam.
+
+---
 
 ## 6. Tips & Catatan
 
