@@ -209,7 +209,7 @@ py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped" -o "F:\p
 ```
 jika ingin memakai beberapa opsi ada di bagian 2
 
-### A. **Fine‑Tuned / Extended (dataset kita + spesies lama)**
+### B. **Fine‑Tuned / Extended (dataset kita + spesies lama)**
 
 Menambah label baru di atas model asli.
 
@@ -217,7 +217,7 @@ Menambah label baru di atas model asli.
 py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train2" --model_save_mode append
 ```
 
-### B. **Retrained (dataset sendiri saja)**
+### C. **Retrained (dataset sendiri saja)**
 
 Membuang layer klasifikasi lama → hanya prediksi spesies dalam dataset kamu.
 
