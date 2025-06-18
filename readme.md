@@ -202,6 +202,9 @@ train1\
 ---
 
 ## Pembagian *Original*, *fine_tuned*, dan *retrained*
+
+> tflite suka error jika dipakai untuk custom classifier, jadi kami pakai raven format
+
 ### A. **Original (hanya dataset dari birdNETnya saja)**
 Hanya Analisis langsung menggunakan model original dari birdNET
 ```powershell
@@ -214,7 +217,13 @@ jika ingin memakai beberapa opsi ada di bagian 2
 Menambah label baru di atas model asli.
 
 ```powershell
-py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train2" --model_save_mode append
+py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train3" --model_format raven --model_save_mode append
+```
+
+setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :\
+
+```powershell
+py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\projek dosen\09mei2025\output\analyze3" --classifier "F:\projek_dosen\09mei2025\output\train3" --slist "F:\projek_dosen\09mei2025\output\train3\labels\label_names.csv"
 ```
 
 ### C. **Retrained (dataset sendiri saja)**
@@ -222,8 +231,15 @@ py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\pr
 Membuang layer klasifikasi lama → hanya prediksi spesies dalam dataset kamu.
 
 ```powershell
-py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train2" --model_save_mode replace
+py -m birdnet_analyzer.train "F:\projek_dosen\09mei2025\train_grouped" -o "F:\projek_dosen\09mei2025\output\train3" --model_format raven --model_save_mode replace
 ```
+
+setelah jalan, kita tinggal analyze memakai model yang telah kita fine tuned dengan kode :\
+
+```powershell
+py -m birdnet_analyzer.analyze "F:\projek_dosen\09mei2025\test_grouped"  -o "F:\projek dosen\09mei2025\output\analyze3" --classifier "F:\projek_dosen\09mei2025\output\train3" --slist "F:\projek_dosen\09mei2025\output\train3\labels\label_names.csv"
+```
+
 > 🔖 **Tip:** Jika label baru ≪ lama, pakai `--focal-loss` atau atur `--upsampling_ratio` agar kelas baru tidak tenggelam.
 
 ---
